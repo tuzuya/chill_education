@@ -1,16 +1,19 @@
 """
-JA: 検索セッション(topics)のルーティング登録。
-VI: Đăng ký routing cho phiên tìm kiếm (topics).
+apps/topics/urls.py
+
+JA: 学習木構造機能のルーティング登録。
+VI: Đăng ký routing cho tính năng cây học tập.
 """
 
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from .views import KnowledgeNodeViewSet, TopicViewSet
+from .views import KnowledgeNodeViewSet, LearningTreeView, TopicViewSet
 
 router = DefaultRouter()
 router.register("topics", TopicViewSet, basename="topic")
 router.register("knowledge-nodes", KnowledgeNodeViewSet, basename="knowledge-node")
-urlpatterns = router.urls
 
-# config/urls.py に以下を1行追加すること:
-#   path("api/", include("apps.topics.urls"))
+urlpatterns = [
+    path("learning-tree/", LearningTreeView.as_view(), name="learning-tree"),
+] + router.urls

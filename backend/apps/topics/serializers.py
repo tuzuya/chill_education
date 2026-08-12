@@ -1,8 +1,9 @@
 """
-JA: Topic・KnowledgeNodeのJSON表現。検索セッション画面向けに必要な項目だけ返す。
-    保存処理や業務判断はここに書かない(services.pyの責務)。
-VI: Biểu diễn JSON của Topic/KnowledgeNode. Chỉ trả các trường cần cho màn hình
-    phiên tìm kiếm. Không viết xử lý lưu hay phán đoán nghiệp vụ ở đây.
+apps/topics/serializers.py
+
+JA: JSONの形の定義と入力検証のみ。保存処理・業務判断は services.py の責務。
+VI: Chỉ định nghĩa hình dạng JSON và kiểm tra đầu vào. Lưu/phán đoán nghiệp vụ
+    thuộc trách nhiệm của services.py.
 """
 
 from rest_framework import serializers
@@ -11,34 +12,17 @@ from .models import KnowledgeNode, Topic
 
 
 class TopicSerializer(serializers.ModelSerializer):
-    # JA: 子Topicがあるかどうか(UI側で開閉アイコンの出し分けに使う)
-    # VI: Có Topic con hay không (frontend dùng để hiện/ẩn icon mở rộng)
-    has_children = serializers.SerializerMethodField()
-
     class Meta:
         model = Topic
-        fields = ["id", "name", "description", "position", "parent", "has_children"]
-        read_only_fields = fields
-
-    def get_has_children(self, obj):
-        return obj.children.exists()
+        fields = ["id", "user", "parent", "name", "description", "position", "created_at"]
+        # JA: user/position はサーバが決める → read_only / VI: user/position do server quyết → read_only
+        read_only_fields = ["id", "user", "position", "created_at"]
 
 
-class KnowledgeNodeSummarySerializer(serializers.ModelSerializer):
-    """一覧・検索結果用の軽量表現 / Biểu diễn nhẹ cho danh sách & kết quả tìm kiếm"""
-
+class KnowledgeNodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = KnowledgeNode
-        fields = ["id", "title", "topic"]
-        read_only_fields = fields
-
-
-class KnowledgeNodeDetailSerializer(serializers.ModelSerializer):
-    """課題詳細表示用 / Dùng cho màn hình xem chi tiết bài toán"""
-
-    topic_name = serializers.CharField(source="topic.name", read_only=True)
-
-    class Meta:
-        model = KnowledgeNode
-        fields = ["id", "title", "content", "topic", "topic_name"]
-        read_only_fields = fields
+        fields = ["id", "topic", "origin_node", "title", "content", "created_at"]
+        # JA: origin_node は AI生成専用(create_derived_node)が設定 → read_only
+        # VI: origin_node chỉ do create_derived_node (AI sinh) thiết lập → read_only
+        read_only_fields = ["id", "origin_node", "created_at"]

@@ -15,45 +15,84 @@ export type User = {
   email: string
 }
 
-// JA: 各機能のドメイン型はここに追加する（バックエンドのシリアライザ出力と形を合わせる）。
-// VI: Thêm kiểu domain của từng tính năng ở đây (khớp hình dạng với output serializer backend).
-
-// JA: チャット機能・思考ツリーに関する型定義（バックエンドのデータ構造に合わせる）。
-// VI: Định nghĩa kiểu dữ liệu cho tính năng Chat và Cây tư duy (khớp cấu trúc dữ liệu backend).
-
 export type SenderType = 'USER' | 'AI'
+export type NodeType = 'STEP' | 'ANSWER' | 'CHANGE_METHOD'
 
+// JA: チャットメッセージ。ChatMessageSerializer と対応。
+// VI: Tin nhắn chat, tương ứng ChatMessageSerializer backend.
 export type ChatMessage = {
   id: string
   session: string
+  parent_message: string | null
   sender: SenderType
   message_text: string
   is_hint: boolean
-  sent_at: string
-}
-
-export type ChatSession = {
-  id: string
-  user: number
-  attempt: string
-  title: string
+  node_type: NodeType
   created_at: string
 }
 
-// JA: Chat機能専用の思考ツリーノード（ユーザーが通過したステップのみを記録）。
-// VI: Node cây tư duy dành riêng cho feature Chat (chỉ ghi nhận các bước người dùng đã đi qua).
+// JA: チャットセッション。ChatSessionSerializer と対応。
+// VI: Phiên chat, tương ứng ChatSessionSerializer backend.
+export type ChatSession = {
+  id: string
+  user: number
+  title: string
+  messages?: ChatMessage[]
+  created_at: string
+}
+
 export type StepNode = {
   id: string
+  step_number: number
+  label: string
+  parentId?: string
+  childrenIds?: string[]
+}
+
+// JA: メッセージ送信ペイロード。SendMessageInputSerializer と対応。
+// VI: Payload gửi tin nhắn, tương ứng SendMessageInputSerializer backend.
+export type SendMessagePayload = {
+  message_text: string
+  parent_message_id?: string | null
+  action_type: 'ANSWER' | 'CHANGE_METHOD'
+}
+
+// JA: React Flow用のグラフデータ型。GET /api/chat-sessions/{id}/graph/ と対応。
+// VI: Kiểu dữ liệu Graph cho React Flow, tương ứng GET /api/chat-sessions/{id}/graph/.
+export type FlowNode = {
+  id: string
+  type: string
+  data: {
+    label: string
+    text: string
+    node_type: NodeType
+  }
+}
+
+export type FlowEdge = {
+  id: string
+  source: string
+  target: string
+}
+
+export type GraphData = {
+  nodes: FlowNode[]
+  edges: FlowEdge[]
   step_number: number      // JA: ステップ番号 / VI: Thứ tự bước (1, 2, 3...)
   label: string            // JA: ステップの簡潔な概要 / VI: Tóm tắt ngắn gọn của bước
   parentId?: string        // JA: 親ステップID / VI: ID bước trước đó
   childrenIds?: string[]   // JA: 子ステップID群 / VI: Danh sách ID bước con (nếu có chia nhánh)
 }
 
-// JA: 学習内容ツリーのノード（バックエンドのシリアライザ出力に合わせて更新すること）。
-// VI: Node cây nội dung đã học (cần cập nhật khớp output serializer backend sau này).
+// JA: 学習内容ツリーのノード。GET /api/learning-tree/ と対応。
+//     type で「棚(topic)」か「本(knowledge_node)」かを区別する
+//     （knowledge_node のみ復習開始(node_id)の対象にできる）。
+// VI: Node cây nội dung đã học, tương ứng GET /api/learning-tree/.
+//     type phân biệt "kệ" (topic) hay "sách" (knowledge_node)
+//     (chỉ knowledge_node mới dùng để bắt đầu ôn tập qua node_id).
 export type TreeNode = {
   id: string
   label: string
+  type: 'topic' | 'knowledge_node'
   children?: TreeNode[]
 }
