@@ -137,6 +137,10 @@ def record_review_result(attempt) -> ReviewSchedule:
       ReviewLog を作成する。origin_node が無い(=常設ノードを直接解いた
       = 対話機能での初回学習)場合は ReviewLog は作らず、SM-2の更新だけ行う。
     - SM-2の更新自体は、初回学習・復習のどちらでも常に行う。
+
+    ★現時点ではまだ呼び出せない(2026-08-12時点)★
+    apps.chat.models.Attempt はチャット担当側でまだ実装されていない
+    (設計上は存在する予定のモデル)。実装され次第、呼び出せるようになる。
     """
     from .models import ReviewLog  # アプリ間の循環importを避けるため関数内import
 
@@ -161,9 +165,9 @@ def start_review(user, source_node: KnowledgeNode):
     """
     間隔復習機能から、対話機能(チャットセッション)へ処理を引き継ぐ入口。
 
-    Attempt・ChatSession の作成はチャット機能側の責務なので、ここでは
-    生成した類題ノードを作ったうえで、チャット機能の start_attempt() に
-    「誰が(user)」「どのノードを解くか(node_id)」だけを渡す。
+    Attempt・ChatSessionの作成はチャット機能側(apps.chat)の責務なので、
+    ここでは生成した類題ノードを作ったうえで、チャット機能に
+    「誰が(user)」「どのノードを解くか(node_id)」だけを渡す想定。
 
     渡さないもの(あえて渡さない):
     - 問題文・タイトルなどのノードの中身
@@ -173,11 +177,20 @@ def start_review(user, source_node: KnowledgeNode):
         -> node.origin_node の有無で判定できるので不要
     - performance_rating の計算方法
         -> record_review_result() 側の責務であり、開始時点では関係ない
-    """
-    from apps.learning.services import start_attempt  # アプリ間の循環importを避けるため関数内import
 
-    generated_node = generate_similar_problem(source_node)
-    return start_attempt(user=user, node_id=generated_node.id)
+    ★現時点ではまだ呼び出せない(2026-08-12時点)★
+    apps.chat.models.Attempt / apps.chat.services 側の受け口が
+    まだ実装されていないため、呼び出し先が存在しない。実装され次第、
+    下記のNotImplementedErrorを実際の呼び出しに置き換える。
+    """
+    generated_node = generate_similar_problem(source_node)  # noqa: F841 (依頼が通るまで未使用)
+    raise NotImplementedError(
+        "apps.chat側でAttempt・受け口となるservices関数が実装される"
+        "ようになるまで、start_review は呼び出せません。"
+        "チャット担当への依頼(ChatSessionへのnode/hint_count/completed_at追加、"
+        "またはAttemptモデルの実装)の"
+        "完了を待ってください。"
+    )
 
 
 def generate_similar_problem(source_node: KnowledgeNode) -> KnowledgeNode:

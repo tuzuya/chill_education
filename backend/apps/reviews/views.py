@@ -67,6 +67,12 @@ class ReviewScheduleViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         if source_node is None:
             raise NotFound("KnowledgeNode not found")
 
+        # JA: services.start_review は Attempt を返す想定(apps.chatに
+        #     まだ実装されていない)。実装が完了するまでこのコードは
+        #     実行されない(呼び出し前にNotImplementedErrorになるため)。
+        # VI: services.start_review dự kiến trả về Attempt (chưa được hiện
+        #     thực bên apps.chat). Đoạn này chưa chạy được cho đến khi hiện
+        #     thực xong (vì bị chặn bởi NotImplementedError trước đó).
         attempt = services.start_review(user=request.user, source_node=source_node)
         return Response(
             {
