@@ -1,6 +1,3 @@
-from django.shortcuts import render
-
-# Create your views here.
 """
 JA: 認可・入力検証・services呼び出し・シリアライズのみ。業務ロジックは書かない。
 VI: Chỉ phân quyền, kiểm tra đầu vào, gọi services, tuần tự hóa. Không viết
@@ -23,9 +20,7 @@ from .serializers import (
 )
 
 
-class TopicViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
-):
+class TopicViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     serializer_class = TopicSerializer
     permission_classes = [IsAuthenticated]
 
@@ -84,6 +79,4 @@ class KnowledgeNodeViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     def get_queryset(self):
         # JA: ★所有者絞り込み(必須)。Topic経由でuserを辿る
         # VI: ★Lọc theo chủ sở hữu (bắt buộc). Đi qua Topic để lấy user
-        return KnowledgeNode.objects.filter(
-            topic__user=self.request.user
-        ).select_related("topic")
+        return KnowledgeNode.objects.filter(topic__user=self.request.user).select_related("topic")

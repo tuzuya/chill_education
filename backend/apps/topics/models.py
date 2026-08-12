@@ -38,9 +38,7 @@ class Topic(BaseModel):
     # 誤操作対策が必要なら論理削除(archived_at)への変更を検討すること。
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    position = models.PositiveIntegerField(
-        default=0, help_text="UI上でのブランチ(枝)の表示順序"
-    )
+    position = models.PositiveIntegerField(default=0, help_text="UI上でのブランチ(枝)の表示順序")
 
     class Meta:
         ordering = ["position", "created_at"]

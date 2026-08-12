@@ -18,9 +18,7 @@ def get_children(topic: Topic):
         Dùng cho UI duyệt sâu dần. Không bao gồm node類題 AI sinh dùng một lần.
     """
     child_topics = topic.children.all().order_by("position", "created_at")
-    nodes = topic.knowledge_nodes.filter(origin_node__isnull=True).order_by(
-        "-created_at"
-    )
+    nodes = topic.knowledge_nodes.filter(origin_node__isnull=True).order_by("-created_at")
     return child_topics, nodes
 
 
@@ -34,9 +32,7 @@ def get_descendant_topic_ids(topic: Topic) -> list:
     ids = [topic.id]
     frontier = [topic.id]
     while frontier:
-        children = list(
-            Topic.objects.filter(parent_id__in=frontier).values_list("id", flat=True)
-        )
+        children = list(Topic.objects.filter(parent_id__in=frontier).values_list("id", flat=True))
         if not children:
             break
         ids.extend(children)
