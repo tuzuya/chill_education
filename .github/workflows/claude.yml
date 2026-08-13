@@ -43,8 +43,12 @@ jobs:
           # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
           # prompt: 'Update the pull request description to include a summary of changes.'
 
-          # Optional: Add claude_args to customize behavior and configuration
+          # JA: モデルを明示的に固定する。未指定だと action のデフォルトに従うため、
+          #     使用量が読みにくくなる。レビュー用途は Sonnet 5 で十分。
+          # VI: Cố định model một cách tường minh. Nếu không chỉ định thì sẽ theo
+          #     mặc định của action, khiến mức tiêu thụ khó dự đoán. Với mục đích
+          #     review thì Sonnet 5 là đủ.
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
-          # claude_args: '--allowed-tools Bash(gh pr *)'
+          claude_args: '--model claude-sonnet-5'
 
