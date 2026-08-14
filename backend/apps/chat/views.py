@@ -8,7 +8,12 @@ from apps.common.permissions import IsOwner
 
 from . import services
 from .models import ChatSession
-from .serializers import ChatMessageSerializer, ChatSessionSerializer, SendMessageInputSerializer
+from .serializers import (
+    AttemptSerializer,
+    ChatMessageSerializer,
+    ChatSessionSerializer,
+    SendMessageInputSerializer,
+)
 
 
 class ChatSessionViewSet(
@@ -34,10 +39,17 @@ class ChatSessionViewSet(
 
     @action(detail=True, methods=["post"], url_path="send-message")
     def send_message(self, request, pk=None):
+        """
+        JA: メッセージ送信エンドポイント。HINT/COMPLETE送信後は
+            current_attempt(最新のhint_count・completed_at)も一緒に返す。
+            フロント側が別途セッションを再取得しなくて済むようにするため。
+        VI: Endpoint gửi tin nhắn. Sau khi gửi HINT/COMPLETE, trả về kèm
+            current_attempt (hint_count/completed_at mới nhất). Để frontend
+            không cần fetch lại session riêng.
+        """
         session = self.get_object()
         input_serializer = SendMessageInputSerializer(data=request.data)
         input_serializer.is_valid(raise_exception=True)
-
         result = services.send_message_and_get_ai_response(
             session=session,
             user_message_text=input_serializer.validated_data["message_text"],
@@ -45,6 +57,11 @@ class ChatSessionViewSet(
             action_type=input_serializer.validated_data["action_type"],
             understood=input_serializer.validated_data.get("understood", False),
         )
+
+        current_attempt = None
+        if input_serializer.validated_data["action_type"] in ("HINT", "COMPLETE"):
+            attempt = services.get_or_create_active_attempt(session=session)
+            current_attempt = AttemptSerializer(attempt).data
 
         return Response(
             {
@@ -54,6 +71,7 @@ class ChatSessionViewSet(
                 "ai_message": ChatMessageSerializer(result["ai_message"]).data
                 if result.get("ai_message")
                 else None,
+                "current_attempt": current_attempt,
             },
             status=status.HTTP_200_OK,
         )
