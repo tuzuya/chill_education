@@ -7,13 +7,31 @@ JA: 本番用の設定のスケルトン。DB は環境変数から PostgreSQL �
 VI: Bộ khung cấu hình production. DB dựng PostgreSQL từ biến môi trường, secret luôn
     tiêm qua biến môi trường. Hiện chưa deploy nên giữ tối thiểu. Đây là nơi hiện thực
     yêu cầu "sau này chuyển từ SQLite sang PostgreSQL".
+
+【設計変更 2026-10-09】
+JA: DJANGO_SECRET_KEY が無いと起動時にエラーで止めるようにした。以前は base の公開済み
+    既定値で黙って起動してしまい、設定漏れに気づけず Cookie を偽造されうる状態だった。
+    あわせて HSTS を有効化した。
+【Thay đổi thiết kế 2026-10-09】
+VI: Thiếu DJANGO_SECRET_KEY thì dừng ngay khi khởi động. Trước đây app lặng lẽ chạy với
+    giá trị mặc định đã công khai trong base, không phát hiện được thiếu cấu hình và có thể
+    bị giả mạo Cookie. Đồng thời bật HSTS.
 """
 
 import os
 
+from django.core.exceptions import ImproperlyConfigured
+
 from .base import *  # noqa: F401,F403
+from .base import BASE_DIR, MIDDLEWARE
 
 DEBUG = False
+
+# JA: 本番では SECRET_KEY を必須にする（未設定なら起動させない）。
+# VI: Ở production bắt buộc SECRET_KEY (chưa đặt thì không cho khởi động).
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
+if not SECRET_KEY:
+    raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set in production")
 
 # JA: 本番ホストは環境変数から。カンマ区切りで複数指定可。
 # VI: Host production lấy từ biến môi trường, phân tách bằng dấu phẩy.
@@ -53,6 +71,17 @@ CSRF_COOKIE_SAMESITE = "None"
 #     Thiếu dòng này thì Django hiểu nhầm đang phản hồi qua HTTP, làm sai phán đoán về
 #     Secure Cookie/redirect.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# JA: HSTS。ブラウザに「以後このホストは HTTPS でしか開かない」と覚えさせる。
+#     onrender.com は共有ドメインなので includeSubDomains / preload は付けない。
+#     HTTP→HTTPS のリダイレクトは Render が入口で行うため SECURE_SSL_REDIRECT は使わない
+#     (内部の HTTP ヘルスチェックまでリダイレクトされて失敗するため)。
+# VI: HSTS. Bảo trình duyệt "từ nay host này chỉ mở bằng HTTPS".
+#     onrender.com là domain dùng chung nên không bật includeSubDomains / preload.
+#     Render đã redirect HTTP→HTTPS ở cổng vào nên không dùng SECURE_SSL_REDIRECT
+#     (nếu bật thì cả health check HTTP nội bộ cũng bị redirect và thất bại).
+SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
+SILENCED_SYSTEM_CHECKS = ["security.W005", "security.W008", "security.W021"]
 
 # JA: フロントのオリジンを環境変数で指定する(カンマ区切りで複数可)。例:
 #     CORS_ALLOWED_ORIGINS=https://chill-education.vercel.app
