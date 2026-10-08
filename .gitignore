@@ -32,3 +32,7 @@ frontend/.vite/
 .idea/
 .vscode/
 *.swp
+
+# JA: デザイン参考画像(他作品のスクリーンショット等)は第三者の著作物なのでコミットしない。
+# VI: Ảnh tham khảo thiết kế (ảnh chụp tác phẩm khác...) là tác phẩm của bên thứ ba nên không commit.
+.claude/design-like/
