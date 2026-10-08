@@ -16,6 +16,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.common.throttles import LoginRateThrottle, SignupRateThrottle
+
 from . import services
 from .serializers import LoginSerializer, SignupSerializer, UserSerializer
 
@@ -38,6 +40,7 @@ class LoginView(APIView):
     """JA: ログイン。未認証でも叩けるよう AllowAny。VI: Đăng nhập; AllowAny để chưa auth vẫn gọi được."""
 
     permission_classes = [AllowAny]
+    throttle_classes = [LoginRateThrottle]
 
     def post(self, request):
         # 1) JA: 入力検証（serializer） / VI: Kiểm tra đầu vào (serializer)
@@ -67,6 +70,7 @@ class SignupView(APIView):
     """
 
     permission_classes = [AllowAny]
+    throttle_classes = [SignupRateThrottle]
 
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
