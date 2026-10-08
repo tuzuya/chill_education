@@ -18,6 +18,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.common.permissions import IsOwner
+from apps.common.throttles import AIRateThrottle
 
 from . import services
 from .models import KnowledgeNode, SearchHistory, Topic
@@ -74,7 +75,7 @@ class TopicViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.Gene
         )
         return Response(KnowledgeNodeSummarySerializer(results, many=True).data)
 
-    @action(detail=False, methods=["post"], url_path="ai-search")
+    @action(detail=False, methods=["post"], url_path="ai-search", throttle_classes=[AIRateThrottle])
     def ai_search(self, request):
         """
         JA: 単語がわからないユーザー向け。曖昧な説明文をAIに渡し、学習カテゴリ名の

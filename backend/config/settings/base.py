@@ -120,6 +120,15 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "EXCEPTION_HANDLER": "apps.common.exceptions.drf_exception_handler",
+    # JA: 回数制限。数え方は apps/common/throttles.py 参照。発表デモで聴衆が同じ Wi-Fi(同じIP)
+    #     から一斉に登録しても詰まらないよう signup は緩めにしてある。
+    # VI: Giới hạn tần suất. Cách đếm xem apps/common/throttles.py. signup để lỏng để khán giả
+    #     cùng Wi-Fi (cùng IP) đăng ký đồng loạt khi demo vẫn không bị chặn.
+    "DEFAULT_THROTTLE_RATES": {
+        "login": "10/min",
+        "signup": "60/hour",
+        "ai": "20/min",
+    },
 }
 
 # --- 国際化 / Quốc tế hóa ---

@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.common.permissions import IsOwner
+from apps.common.throttles import AIRateThrottle
 
 from . import services
 from .models import ChatSession
@@ -52,7 +53,9 @@ class ChatSessionViewSet(
             title=serializer.validated_data.get("title"),
         )
 
-    @action(detail=True, methods=["post"], url_path="send-message")
+    @action(
+        detail=True, methods=["post"], url_path="send-message", throttle_classes=[AIRateThrottle]
+    )
     def send_message(self, request, pk=None):
         session = self.get_object()
         input_serializer = SendMessageInputSerializer(data=request.data)
