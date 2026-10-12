@@ -1,25 +1,96 @@
-# Team App — モノレポ土台 / Nền tảng monorepo
+# chill_education
 
-JA: Django 5 + DRF（バックエンド）と React 18 + TypeScript + Vite（フロント・全画面SPA）の
-モノレポの**土台**です。共通基盤（設定・認証・共通モデル・AI抽象化・フロントの通信/状態管理）と
-**実装規約**を用意し、各機能は各担当が [`CONVENTIONS.md`](./CONVENTIONS.md) の**パターン（§9）**に沿って追加します。
-VI: **Nền tảng** monorepo gồm Django 5 + DRF (backend) và React 18 + TypeScript + Vite (frontend, SPA toàn trang).
-Cung cấp hạ tầng chung (cấu hình, xác thực, model chung, trừu tượng AI, giao tiếp/quản lý state frontend) và
-**quy ước hiện thực**; mỗi tính năng do người phụ trách thêm theo **pattern (§9)** trong [`CONVENTIONS.md`](./CONVENTIONS.md).
-
-> **開発規約は必ず [`CONVENTIONS.md`](./CONVENTIONS.md) を読むこと。AI に依頼する時も一緒に読ませる。**
-> コード上に「見本機能」は置かず、実装パターンは同文書 §9 に集約しています。
-> **Luôn đọc [`CONVENTIONS.md`](./CONVENTIONS.md). Khi nhờ AI cũng cho đọc kèm.**
-> Không đặt "tính năng mẫu" trong code; pattern hiện thực gom ở §9 của tài liệu đó.
+JA: AI が答えを教えず「問い」で導くことで、学生が自分で考えながら学べる AI 学習支援 Web アプリ。
+VI: Ứng dụng web hỗ trợ học tập bằng AI: AI không đưa ra đáp án mà dẫn dắt bằng "câu hỏi", giúp sinh viên tự suy nghĩ khi học.
 
 ---
 
-## 技術構成 / Stack
+## 概要 / Tổng quan
 
-- Backend: **Django 5 + Django REST Framework**、認証は**セッション認証**（JWTは使わない）
-- Frontend: **React 18 + TypeScript + Vite**（全画面SPA）、サーバ状態は **TanStack Query**
-- DB: **SQLite**（ローカル）。`config/settings/production.py` で **PostgreSQL に切替可能**
-- AI: **プロバイダ抽象化層**。既定は **fake 実装（APIキー不要）**。`AI_PROVIDER=gemini` で Gemini に切替（スケルトン）
+JA: gPBL（Global Project Based Learning）で、ベトナムの学生と日本の学生の合同チームが開発したアプリです。
+開発テーマは「**AI が当たり前になった時代に、学生たちが自分で考え、主体的に学び、成長を感じることができる Web アプリ**」。
+
+一般的な AI 学習ツールは質問すると答えを返すため、考えずに答えだけを写しがちです。
+このアプリの AI チューターは最終的な答えを出さず、ヒント・誘導質問・小さな問いへの分解で学習者を導きます。
+学んだ内容はツリー構造の知識ベースに蓄積され、間隔反復で「そろそろ復習すべきもの」を知らせます。
+
+プロダクト名は未定です。リポジトリ名の `chill_education` は、gPBL でのチーム名「chill」と、
+開発テーマ（学生の主体的な学び）を表す「education」を合わせたものです。
+
+VI: Ứng dụng do nhóm chung sinh viên Việt Nam và Nhật Bản phát triển trong chương trình gPBL (Global Project Based Learning).
+Chủ đề phát triển: "**Một ứng dụng web giúp sinh viên tự suy nghĩ, chủ động học tập và cảm nhận được sự trưởng thành trong thời đại AI đã trở nên phổ biến**".
+
+Các công cụ học tập AI thông thường trả lời ngay khi được hỏi, nên người học dễ chép đáp án mà không suy nghĩ.
+Gia sư AI của ứng dụng này không đưa ra đáp án cuối cùng, mà dẫn dắt bằng gợi ý, câu hỏi định hướng và chia nhỏ vấn đề.
+Nội dung đã học được lưu vào cơ sở tri thức dạng cây, và nhắc "nên ôn lại" theo phương pháp lặp lại ngắt quãng.
+
+Tên sản phẩm chưa được quyết định. Tên repo `chill_education` ghép từ tên nhóm "chill" trong gPBL
+và "education" thể hiện chủ đề phát triển (việc học chủ động của sinh viên).
+
+---
+
+## 主な機能 / Tính năng chính
+
+### ヒントチャット / Chat gợi ý（`/hint-chat`）
+
+- JA: AI は答えを直接出さず、ヒントと問いで段階的に導く（システムプロンプトで徹底）
+  VI: AI không đưa đáp án trực tiếp mà dẫn dắt từng bước bằng gợi ý và câu hỏi (đảm bảo bằng system prompt)
+- JA: 会話の各発言を AI が「幹（学習の大きなステップ）」か「枝（掘り下げの質問）」かに分類し、思考ツリーとして自動整理
+  VI: AI phân loại từng phát ngôn thành "thân" (bước học lớn) hay "nhánh" (câu hỏi đào sâu) và tự sắp xếp thành cây tư duy
+- JA: どの過去の発言に続く質問かを AI が推定し、確信度が低いときはユーザーに確認する
+  VI: AI đoán câu hỏi nối tiếp phát ngôn nào trước đó; khi độ tin cậy thấp thì hỏi lại người dùng
+- JA: チャットが終わると、会話を要約して学習ツリーに「知識ノード」として保存
+  VI: Khi kết thúc chat, nội dung được tóm tắt và lưu vào cây học tập dưới dạng "node tri thức"
+
+### 学習ツリー / Cây học tập（`/learning-tree`）
+
+- JA: 学んだ内容を「トピック（フォルダのような階層）× 知識ノード」で管理・可視化
+  VI: Quản lý và trực quan hóa nội dung đã học theo "topic (phân cấp như thư mục) × node tri thức"
+- JA: トピック配下の検索と検索履歴、曖昧な説明からキーワード候補を出す AI 検索アシスト
+  VI: Tìm kiếm trong topic kèm lịch sử, và trợ lý tìm kiếm AI gợi ý từ khóa từ mô tả mơ hồ
+- JA: 復習を重ねるほど色が濃くなる「定着度」で、どこが定着済みかを一目で確認できる
+  VI: "Mức độ ghi nhớ" đậm dần theo số lần ôn, giúp nhìn qua là biết phần nào đã nhớ chắc
+
+### 復習リマインド / Nhắc ôn tập
+
+- JA: 間隔反復アルゴリズム SM-2 で次回の復習日を計算し、期限を過ぎたノードを一覧表示
+  VI: Tính ngày ôn tiếp theo bằng thuật toán lặp lại ngắt quãng SM-2 và liệt kê các node đã quá hạn
+- JA: 理解度は自己申告させず、「予定日にノードを開いて復習を完了したか」という行動で判断する
+  VI: Không bắt tự đánh giá mức hiểu, mà đánh giá bằng hành động "có mở node và hoàn thành ôn đúng ngày không"
+
+---
+
+## 技術構成 / Công nghệ
+
+| 領域 / Phần | 技術 / Công nghệ |
+|---|---|
+| Frontend | React 18 + TypeScript + Vite（SPA）、TanStack Query、React Router、React Flow（`@xyflow/react`）、Tailwind CSS |
+| Backend | Django 5 + Django REST Framework（セッション認証 / xác thực session） |
+| DB | SQLite（ローカル / local）、PostgreSQL（本番 / production） |
+| AI | プロバイダ抽象化層 / lớp trừu tượng provider: `fake`（API キー不要 / không cần API key）・Gemini・Claude |
+| Hosting | Vercel（Frontend）、Render（Backend） |
+| CI | GitHub Actions（ruff・型チェック / kiểm kiểu・ビルド / build） |
+
+```
+[ブラウザ / Trình duyệt]
+   │  React SPA（Vercel）
+   │  /api/*  セッション Cookie + CSRF / Cookie session + CSRF
+   ▼
+[Django REST Framework]（Render）
+   ├── accounts  認証 / xác thực
+   ├── chat      ヒントチャット・思考ツリー / chat gợi ý, cây tư duy
+   ├── topics    学習ツリー・検索 / cây học tập, tìm kiếm
+   ├── reviews   SM-2 による復習 / ôn tập theo SM-2
+   └── ai        LLM 抽象化 / trừu tượng LLM ──▶ Gemini / Claude / fake
+```
+
+JA: バックエンドは `views → services → models` の一方向依存に統一し、業務ロジックは `services.py` に置きます。
+すべてのデータはユーザー単位で絞り込み、他人のデータには触れられないようにしています。
+5 人のチームで同じ形のコードを書けるよう、実装パターンを [`CONVENTIONS.md`](./CONVENTIONS.md) にまとめています。
+
+VI: Backend thống nhất phụ thuộc một chiều `views → services → models`, logic nghiệp vụ đặt ở `services.py`.
+Mọi dữ liệu đều lọc theo người dùng để không chạm được dữ liệu của người khác.
+Để nhóm 5 người viết code cùng một kiểu, các pattern hiện thực được tổng hợp trong [`CONVENTIONS.md`](./CONVENTIONS.md).
 
 ---
 
@@ -29,48 +100,50 @@ Cung cấp hạ tầng chung (cấu hình, xác thực, model chung, trừu tư�
 .
 ├── CONVENTIONS.md          # 開発規約（最重要）/ Quy ước (quan trọng nhất)
 ├── .env.example            # 環境変数の雛形 / Mẫu biến môi trường
-├── .github/                # CI・PRテンプレート
+├── .github/                # CI・PR テンプレート / CI, mẫu PR
 ├── backend/
-│   ├── config/             # 設定(base/local/production)・urls・wsgi/asgi
+│   ├── config/             # 設定(base/local/production)・urls / cấu hình, urls
 │   ├── apps/
-│   │   ├── common/         # 基底モデル(UUID)・共通例外・IsOwner権限・seedコマンド
-│   │   ├── accounts/       # カスタムUser・セッション認証API（共通基盤）
-│   │   └── ai/             # LLM抽象化: base(Protocol)/fake/gemini/client
-│   ├── requirements/       # base.txt / local.txt / gemini.txt
-│   └── manage.py
+│   │   ├── common/         # 基底モデル・共通例外・権限・レート制限・seed / model gốc, ngoại lệ, quyền, rate limit, seed
+│   │   ├── accounts/       # カスタム User・認証 API / User tùy biến, API xác thực
+│   │   ├── ai/             # LLM 抽象化 / trừu tượng LLM: fake / gemini / claude
+│   │   ├── chat/           # ヒントチャット / chat gợi ý
+│   │   ├── topics/         # 学習ツリー / cây học tập
+│   │   └── reviews/        # 間隔復習 / ôn tập ngắt quãng
+│   └── requirements/       # base / local / gemini / production
 └── frontend/
     └── src/
-        ├── app/            # Provider・router・RequireAuth
-        ├── pages/          # 組み立てのみ（HomePage=ログイン後の土台）
-        ├── features/       # auth（共通基盤）。各機能はここに追加
-        └── shared/         # api(client,queryKeys)・ui・types
+        ├── app/            # Provider・router・認証ガード / auth guard
+        ├── pages/          # 画面の組み立て / ghép màn hình
+        ├── features/       # auth / hintChat / learningTree / reviews
+        └── shared/         # API クライアント・UI・型 / API client, UI, kiểu
 ```
 
 ---
 
-## セットアップ / Cài đặt（clone → 起動）
+## 開発環境の構築 / Cài đặt môi trường phát triển
 
 前提 / Yêu cầu: **Python 3.13**, **Node 20+**
 
 ### 1. リポジトリ直下 / Ở gốc repo
+
 ```bash
-cp .env.example .env      # 中身は空でOK（fake AIで動く）/ để trống cũng được (chạy fake AI)
+cp .env.example .env      # 中身は空でOK（fake AI で動く）/ để trống cũng được (chạy fake AI)
 ```
 
 ### 2. バックエンド / Backend
+
 ```bash
 cd backend
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements/local.txt
 python manage.py migrate
-python manage.py seed        # デモユーザーを投入 / nạp user demo
+python manage.py seed        # デモユーザーとサンプルの学習ツリーを投入 / nạp user demo và cây học tập mẫu
 python manage.py runserver   # http://localhost:8000
 ```
-> JA: リポジトリには既存の `myvenv/` があります。それを使う場合は
-> `source myvenv/bin/activate` でも構いません（新規は上記 `.venv` を推奨）。
-> VI: Repo có sẵn `myvenv/`. Nếu dùng nó thì `source myvenv/bin/activate` cũng được (khuyến nghị tạo mới `.venv`).
 
 ### 3. フロントエンド / Frontend（別ターミナル / terminal khác）
+
 ```bash
 cd frontend
 npm install
@@ -78,59 +151,45 @@ npm run dev                  # http://localhost:5173
 ```
 
 ### 4. ログイン / Đăng nhập
-ブラウザで **http://localhost:5173** を開く → `demo` / `demo12345` でログイン →
-ホーム画面（ユーザー名＋ログアウト）が表示されます。ここから各自が機能を追加します。
-Mở **http://localhost:5173** → đăng nhập `demo` / `demo12345` → thấy trang chủ (tên user + đăng xuất).
-Từ đây mỗi người thêm tính năng của mình.
 
-> `/api` は Vite が `:8000` にプロキシします（同一オリジン化でCookie/CSRFが素直に動く）。
-> Vite proxy `/api` sang `:8000` (cùng origin để Cookie/CSRF chạy trơn tru).
+JA: http://localhost:5173 を開き、`demo` / `demo12345` でログインするか、新規登録します。
+`/api` は Vite が `:8000` にプロキシするので、Cookie と CSRF が同一オリジンとして動きます。
 
----
+VI: Mở http://localhost:5173, đăng nhập bằng `demo` / `demo12345` hoặc đăng ký mới.
+Vite proxy `/api` sang `:8000` nên Cookie và CSRF chạy như cùng origin.
 
-## AI プロバイダ / Nhà cung cấp AI
+### AI プロバイダ / Nhà cung cấp AI
 
-JA: 既定は `AI_PROVIDER=fake` で、**APIキー無しで全員が開発可能**。Gemini を使うときだけ
-`.env` に `AI_PROVIDER=gemini` と `GEMINI_API_KEY=...` を設定します（`gemini.py` は要実装）。
-キー未設定で `gemini` を選んでも、安全のため自動で fake に退避します。
-`google-generativeai`（Gemini公式SDK）は `requirements/local.txt` には含まれていません。
-Windows ARM64など一部の環境で `grpcio`/`cryptography` のビルドに失敗するためです。
-Gemini を実際に呼んで動作確認したい場合のみ `pip install -r requirements/gemini.txt` を実行してください。
-VI: Mặc định `AI_PROVIDER=fake`, **không cần API key mọi người vẫn dev được**. Chỉ khi dùng Gemini
-mới đặt `AI_PROVIDER=gemini` và `GEMINI_API_KEY=...` trong `.env` (`gemini.py` cần được cài).
-Nếu chọn `gemini` mà thiếu key, hệ thống tự lùi về fake cho an toàn.
-`google-generativeai` (SDK chính thức của Gemini) không nằm trong `requirements/local.txt`,
-vì một số môi trường (vd. Windows ARM64) sẽ build lỗi `grpcio`/`cryptography`.
-Chỉ khi thực sự cần gọi Gemini để kiểm tra, hãy chạy `pip install -r requirements/gemini.txt`.
+JA: 既定は `AI_PROVIDER=fake` で、API キーなしで開発できます。実際の LLM を使うときは `.env` に設定します。
+キーが未設定のまま `gemini` / `claude` を選んでも、自動で fake に切り替わります。
 
----
+VI: Mặc định `AI_PROVIDER=fake`, không cần API key vẫn phát triển được. Khi dùng LLM thật thì đặt trong `.env`.
+Nếu chọn `gemini` / `claude` mà chưa có key, hệ thống tự chuyển về fake.
 
-## まだ作っていないもの・なぜ / Chưa làm & vì sao
+| `AI_PROVIDER` | 必要な設定 / Cần đặt | 追加のインストール / Cài thêm |
+|---|---|---|
+| `fake` | なし / không | なし / không |
+| `gemini` | `GEMINI_API_KEY` | `pip install -r requirements/gemini.txt` ※ |
+| `claude` | `ANTHROPIC_API_KEY` | なし（`local.txt` に含まれる）/ không (đã có trong `local.txt`) |
 
-| 未実装 / Chưa có | 理由 / Lý do |
-|---|---|
-| すべての機能アプリ（`chat` `practice` 等）とフロント feature | JA: **意図的に未実装**。コード上の見本を置かず、各担当が [`CONVENTIONS.md`](./CONVENTIONS.md) §9 のパターンに沿って §4/§5 の手順で追加する。DB設計が固まってから着手。 VI: **Cố ý chưa làm.** Không đặt mẫu trong code; mỗi người thêm theo pattern §9 và các bước §4/§5 của [`CONVENTIONS.md`](./CONVENTIONS.md). Bắt đầu sau khi chốt thiết kế DB. |
-| フロントの `entities/` 層 | JA: 規模が小さいため。ドメイン型は当面 `shared/types` に置く。必要になったら導入。 VI: Quy mô nhỏ. Kiểu domain tạm để ở `shared/types`, khi cần mới thêm. |
-| `gemini.py` の本実装 | JA: スケルトンのみ。fake で開発できるため後回し可。AI担当が実装。 VI: Chỉ có khung. Dev bằng fake nên để sau; người phụ trách AI hiện thực. |
-| 本番デプロイ設定 | JA: `production.py` はPostgreSQL切替の受け皿まで。デプロイ手順は別途。 VI: `production.py` mới tới mức chuyển PostgreSQL. Quy trình deploy để riêng. |
+JA: ※ Gemini の SDK は Windows ARM64 など一部の環境でビルドに失敗するため、`local.txt` から分けています。
+VI: ※ SDK của Gemini bị lỗi build trên một số môi trường như Windows ARM64, nên được tách khỏi `local.txt`.
 
----
-
-## Git 運用 / Quy trình Git
-
-- `main` は保護。直接 push しない。作業ブランチは `develop` から切り、**`develop` へ PR**。
-- ブランチ名: `feat/<機能>` `fix/<内容>` `chore/<内容>`。
-- PR テンプレに従い**他メンバーへの影響**を記載。**CI が緑になってからマージ**。
-- 詳細は [`CONVENTIONS.md`](./CONVENTIONS.md) §7。
-
----
-
-## 動作確認 / Kiểm tra nhanh
+### 動作確認 / Kiểm tra
 
 ```bash
-# backend
-cd backend && ruff check . && ruff format --check . \
-  && python manage.py makemigrations --check --dry-run
-# frontend
-cd frontend && npm run typecheck && npm run build
+cd backend && python manage.py test apps                 # テスト / test
+cd backend && ruff check . && ruff format --check .      # lint
+cd frontend && npm run typecheck && npm run build        # 型チェック・ビルド / kiểm kiểu, build
 ```
+
+---
+
+## 関連ドキュメント / Tài liệu liên quan
+
+| ファイル / File | 内容 / Nội dung |
+|---|---|
+| [`CONVENTIONS.md`](./CONVENTIONS.md) | 開発規約・実装パターン・Git 運用 / Quy ước, pattern hiện thực, quy trình Git |
+| [`FOLDER_GUIDE.ja.md`](./FOLDER_GUIDE.ja.md) / [`FOLDER_GUIDE.vi.md`](./FOLDER_GUIDE.vi.md) | フォルダの役割 / Vai trò từng thư mục |
+| [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md) | UI のデザインルール / Quy tắc thiết kế UI |
+| [`APP_OVERVIEW_FOR_SLIDES.md`](./APP_OVERVIEW_FOR_SLIDES.md) | 機能の詳しい説明 / Mô tả chi tiết tính năng |
