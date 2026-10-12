@@ -3,6 +3,8 @@
 JA: AI が答えを教えず「問い」で導くことで、学生が自分で考えながら学べる AI 学習支援 Web アプリ。
 VI: Ứng dụng web hỗ trợ học tập bằng AI: AI không đưa ra đáp án mà dẫn dắt bằng "câu hỏi", giúp sinh viên tự suy nghĩ khi học.
 
+> **発表資料 / Slide thuyết trình**: [日本語版 / Bản tiếng Nhật（PDF）](docs/slides/chill-education-ja.pdf) ・ [ベトナム語版 / Bản tiếng Việt（PDF）](docs/slides/chill-education-vi.pdf)
+
 ---
 
 ## 概要 / Tổng quan
@@ -26,6 +28,80 @@ Nội dung đã học được lưu vào cơ sở tri thức dạng cây, và nh
 
 Tên sản phẩm chưa được quyết định. Tên repo `chill_education` ghép từ tên nhóm "chill" trong gPBL
 và "education" thể hiện chủ đề phát triển (việc học chủ động của sinh viên).
+
+---
+
+## 背景 / Bối cảnh
+
+JA: 学生の AI 利用は急速に広がる一方で、答えを写すだけの使い方が理解や思考力を弱める、という指摘が出ています。
+
+- 学生の生成 AI 利用率は 57.7%（2024年）から 61.8%（2025年）に増え、66.4% の学生が自分の使い方に後ろめたさを感じている[^sendai]
+- AI を使って文章を書いた参加者の多くが、自分で書いたはずの文章を正しく引用できなかった[^mit]
+- 666 名を対象にした調査で、AI の利用頻度と批判的思考力のスコアに負の相関が見られた[^gerlich]
+
+このアプリは AI を「代わりに答える存在」ではなく「考えるための補助」として位置づけ、この差を埋めることを目指しています。
+
+VI: Việc sinh viên sử dụng AI đang lan rộng nhanh chóng, nhưng cũng có ý kiến cho rằng việc chỉ chép đáp án làm suy giảm sự hiểu bài và năng lực tư duy.
+
+- Tỉ lệ sinh viên sử dụng AI tạo sinh tăng từ 57,7% (2024) lên 61,8% (2025), và 66,4% sinh viên cảm thấy áy náy về cách mình sử dụng AI[^sendai]
+- Nhiều người tham gia dùng AI để viết bài đã không thể trích dẫn chính xác bài viết lẽ ra do chính mình viết[^mit]
+- Khảo sát trên 666 người cho thấy tần suất sử dụng AI có tương quan nghịch với điểm tư duy phản biện[^gerlich]
+
+Ứng dụng này định vị AI không phải là "người trả lời thay" mà là "công cụ hỗ trợ suy nghĩ", nhằm thu hẹp khoảng cách đó.
+
+[^sendai]: 仙台大学 AI 教育研究チーム『学生と教員を対象とした生成 AI の教育利用状況と意識に関する全国調査 2024年-2025年比較調査』(2025年10月) https://www.sendaidaigaku.jp/dnt2/_sendaidaigaku/access/nic_img/1/files/2025_AI-report.pdf
+[^mit]: Kosmyna, N., et al. "Your Brain on ChatGPT: Accumulation of Cognitive Debt when Using an AI Assistant for Essay Writing Task." MIT Media Lab, arXiv:2506.08872 (2025) https://arxiv.org/abs/2506.08872
+[^gerlich]: Gerlich, M. "AI Tools in Society: Impacts on Cognitive Offloading and the Future of Critical Thinking." Societies, 15(1), 6 (2025) https://www.mdpi.com/2075-4698/15/1/6
+
+---
+
+## 開発体制 / Phân công
+
+JA: ベトナムの学生2人と日本の学生3人の5人チームで、機能ごとに国籍で担当を分けました。
+1つの機能を実装するときに、言語の壁はできるだけないほうがよいと考えたためです。
+
+| 担当 / Phụ trách | 機能 / Tính năng |
+|---|---|
+| ベトナム側 / Phía Việt Nam | ヒントチャット・思考ツリー / Chat gợi ý, cây tư duy |
+| 日本側 / Phía Nhật Bản | 学習ツリー・復習（学んだ内容を木構造で蓄える）/ Cây học tập, ôn tập (lưu nội dung đã học theo cấu trúc cây) |
+
+VI: Nhóm 5 người gồm 2 sinh viên Việt Nam và 3 sinh viên Nhật Bản, phân công theo quốc tịch cho từng tính năng.
+Lý do là khi hiện thực một tính năng, rào cản ngôn ngữ càng ít càng tốt.
+
+---
+
+## 画面 / Màn hình
+
+### ヒントチャット / Chat gợi ý
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/1-hint-chat.webp" width="420" alt="AI が答えを出さずに問いを返すヒントチャット"></td>
+    <td width="50%"><img src="docs/screenshots/2-thinking-process.webp" width="420" alt="やり取りが思考プロセスとして積み上がる画面"></td>
+  </tr>
+  <tr>
+    <td>JA: 「コードを教えて」と頼んでも、AI は答えを出さず、まず方式を選ばせる問いを返す<br>VI: Dù được nhờ "hãy chỉ code", AI không đưa đáp án mà trước tiên hỏi lại để người học tự chọn phương pháp</td>
+    <td>JA: やり取りが進むと、学習のステップが「思考プロセス」として積み上がる<br>VI: Khi cuộc trò chuyện tiếp diễn, các bước học được xếp thành "quá trình tư duy"</td>
+  </tr>
+</table>
+
+<img src="docs/screenshots/3-thinking-tree.webp" width="560" alt="幹と枝に整理された思考ツリー">
+
+JA: 大きなステップ（幹・緑）と掘り下げの質問（枝・黄）を AI が分類し、思考ツリーに整理する<br>
+VI: AI phân loại bước lớn (thân, màu xanh lá) và câu hỏi đào sâu (nhánh, màu vàng), rồi sắp xếp thành cây tư duy
+
+### 学習ツリーと復習 / Cây học tập và ôn tập
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/4-due-reviews.webp" width="420" alt="今日の復習の一覧"></td>
+    <td width="50%"><img src="docs/screenshots/5-learning-tree.webp" width="420" alt="トピックごとの学習ツリー"></td>
+  </tr>
+  <tr>
+    <td>JA: 間隔反復（SM-2）で復習日を迎えた・過ぎた内容を「今日の復習」に並べる<br>VI: Liệt kê các nội dung đã đến hoặc quá ngày ôn theo lặp lại ngắt quãng (SM-2) trong "Ôn tập hôm nay"</td>
+    <td>JA: 学んだ内容をトピックごとのツリーで管理する。復習を重ねるほど色が濃くなり、定着度が一目で分かる<br>VI: Quản lý nội dung đã học bằng cây theo topic. Càng ôn nhiều, màu càng đậm, nhìn qua là biết mức độ ghi nhớ</td>
+  </tr>
+</table>
 
 ---
 
