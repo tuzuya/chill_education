@@ -29,6 +29,41 @@ và "education" thể hiện chủ đề phát triển (việc học chủ độ
 
 ---
 
+## 画面 / Màn hình
+
+### ヒントチャット / Chat gợi ý
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/1-hint-chat.webp" width="420" alt="AI が答えを出さずに問いを返すヒントチャット"></td>
+    <td width="50%"><img src="docs/screenshots/2-thinking-process.webp" width="420" alt="やり取りが思考プロセスとして積み上がる画面"></td>
+  </tr>
+  <tr>
+    <td>JA: 「コードを教えて」と頼んでも、AI は答えを出さず、まず方式を選ばせる問いを返す<br>VI: Dù được nhờ "hãy chỉ code", AI không đưa đáp án mà trước tiên hỏi lại để người học tự chọn phương pháp</td>
+    <td>JA: やり取りが進むと、学習のステップが「思考プロセス」として積み上がる<br>VI: Khi cuộc trò chuyện tiếp diễn, các bước học được xếp thành "quá trình tư duy"</td>
+  </tr>
+</table>
+
+<img src="docs/screenshots/3-thinking-tree.webp" width="560" alt="幹と枝に整理された思考ツリー">
+
+JA: 大きなステップ（幹・緑）と掘り下げの質問（枝・黄）を AI が分類し、思考ツリーに整理する<br>
+VI: AI phân loại bước lớn (thân, màu xanh lá) và câu hỏi đào sâu (nhánh, màu vàng), rồi sắp xếp thành cây tư duy
+
+### 学習ツリーと復習 / Cây học tập và ôn tập
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/4-due-reviews.webp" width="420" alt="今日の復習の一覧"></td>
+    <td width="50%"><img src="docs/screenshots/5-learning-tree.webp" width="420" alt="トピックごとの学習ツリー"></td>
+  </tr>
+  <tr>
+    <td>JA: 間隔反復（SM-2）で復習日を迎えた・過ぎた内容を「今日の復習」に並べる<br>VI: Liệt kê các nội dung đã đến hoặc quá ngày ôn theo lặp lại ngắt quãng (SM-2) trong "Ôn tập hôm nay"</td>
+    <td>JA: 学んだ内容をトピックごとのツリーで管理する。復習を重ねるほど色が濃くなり、定着度が一目で分かる<br>VI: Quản lý nội dung đã học bằng cây theo topic. Càng ôn nhiều, màu càng đậm, nhìn qua là biết mức độ ghi nhớ</td>
+  </tr>
+</table>
+
+---
+
 ## 主な機能 / Tính năng chính
 
 ### ヒントチャット / Chat gợi ý（`/hint-chat`）
