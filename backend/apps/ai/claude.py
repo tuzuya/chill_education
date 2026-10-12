@@ -135,9 +135,7 @@ class ClaudeProvider(LLMProvider):
                 if system_instruction:
                     kwargs["system"] = system_instruction
                 response = self.client.messages.create(**kwargs)
-                text = "".join(
-                    block.text for block in response.content if block.type == "text"
-                )
+                text = "".join(block.text for block in response.content if block.type == "text")
                 return ChatResult(text=text)
             except anthropic.RateLimitError as e:
                 last_error = e
